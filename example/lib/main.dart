@@ -388,7 +388,7 @@ class _ChessPageState extends State<ChessPage> {
         return;
       }
       isPlayerTurn = true;
-      chessEngine.movePiece(pos);
+      chessEngine.movePiece(pos, false);
       resetMovesData();
       reloadBoard();
     });
@@ -559,7 +559,7 @@ class _ChessPageState extends State<ChessPage> {
             currentPosition: CellPosition(
                 row: currSelectedElementPosition!.row,
                 col: currSelectedElementPosition!.col));
-        chessEngine.movePiece(move);
+        chessEngine.movePiece(move, false);
         resetMovesData();
         reloadBoard();
         await computerTurn();

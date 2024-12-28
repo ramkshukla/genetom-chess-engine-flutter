@@ -1,3 +1,4 @@
+import 'package:genetom_chess_engine/src/chess_data.dart';
 import 'package:genetom_chess_engine/src/chess_engine_core.dart';
 
 class ValidMoves {
@@ -542,7 +543,14 @@ class ValidMoves {
           emptyCellPower;
       bool res =
           checkMateCheckForThisBoard(board, checkForWhite, boardViewIsWhite);
-
+      if (res) {
+        ChessData.invalidMove = true;
+        ChessData.unvalidMoves.add(CellPosition(
+            row: moves.targetPosition.row, col: moves.targetPosition.col));
+      } else {
+        ChessData.unvalidMoves.clear();
+        ChessData.invalidMove = false;
+      }
       // Undoing the move
       board[moves.currentPosition.row][moves.currentPosition.col] =
           board[moves.targetPosition.row][moves.targetPosition.col];

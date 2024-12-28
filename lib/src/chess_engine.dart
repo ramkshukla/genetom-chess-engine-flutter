@@ -2,9 +2,10 @@
 
 import 'dart:async';
 import 'dart:math';
-
-import 'package:genetom_chess_engine/src/chess_engine_core.dart';
-import 'package:genetom_chess_engine/src/valid_moves.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:genetom_chess_engine/genetom_chess_engine.dart';
+import 'package:genetom_chess_engine/src/chess_data.dart';
+import 'package:genetom_chess_engine/src/online_chess_data.dart';
 
 class ChessEngine {
   //Position tables
@@ -23,7 +24,16 @@ class ChessEngine {
   List<List<double>> _blackQueenTable = [];
   List<List<double>> _blackKingMidGameTable = [];
   List<List<double>> _blackKingEndgameTable = [];
+  bool _pieceCaptured = false;
+  // Getter for pieceCaptured
+  bool get pieceCaptured => _pieceCaptured;
 
+  // Setter for pieceCaptured
+  set pieceCaptured(bool capturedPiece) {
+    _pieceCaptured = capturedPiece;
+  }
+
+  bool isWhite = false;
   List<List<int>> _board = [
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
@@ -34,14 +44,22 @@ class ChessEngine {
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
   ];
-  final List<MovesLogModel> _moveLogs = [];
   int _maxDepth = 1;
   late bool boardViewIsWhite;
   late ChessConfig chessConfig;
   late Function(List<List<int>>) _boardChangeCallback;
   Function(bool, CellPosition)? _pawnPromotion;
   late Function(GameOver) _gameOverCallback;
+  final List<MovesLogModel> _moveLogs = [];
+  // Method to capture a piece
+  void capturePiece(String capturedPieceName) {
+    capturedPieceHistory.add(capturedPieceName);
+  }
 
+  // List to store FEN and captured pieces at each move
+  List<Map<String, dynamic>> fenHistoryWithCaptures = [];
+  // List to track captured pieces
+  List<int> capturedPieces = [];
   int _halfMoveClock = 0;
   int _fullMoveNumber = 0;
 
@@ -576,14 +594,72 @@ class ChessEngine {
   }
 
   /// This method use to move a piece in a board.
-  void movePiece(MovesModel move) {
+  void movePiece(MovesModel move, bool offline) {
     _updateHalfMoveClock(move);
     _updateFullMoveNumber(move);
+    // Get the pieces on the board at the current and target positions
+    int currentPiece =
+        _board[move.currentPosition.row][move.currentPosition.col];
+    int targetPiece = _board[move.targetPosition.row][move.targetPosition.col];
+    // Check if there is an opponent's piece at the target position (capture occurs)
+    ChessData.lastPieceMoveColor = currentPiece > 0 ? "white" : "black";
+    (currentPiece == 20000 && currentPiece > 0)
+        ? ChessData.whiteKingPositions = {
+            'row': move.targetPosition.row,
+            'col': move.targetPosition.col
+          }
+        : ChessData.blackKingPositions = {
+            'row': move.targetPosition.row,
+            'col': move.targetPosition.col
+          };
+
+    bool isCapture = targetPiece != emptyCellPower &&
+        (targetPiece > 0 != currentPiece > 0); // Pieces are of opposite sides
+    OnlineChessData.caputuredPiece = "";
+    if (isCapture) {
+      pieceCaptured = true;
+      print(
+          'Capture occurred: Piece captured at position (${move.targetPosition.row}, ${move.targetPosition.col})');
+      String capturedPieceName = getPieceName(targetPiece);
+      OnlineChessData.caputuredPiece = capturedPieceName;
+      print("Captured Piece name ${capturedPieceName}");
+      // chessPieces.add({
+      // "name": "Bishop",
+      // "color": "white",
+      // "image": "assets/ChessPiece/white_bishop.svg",
+      // "count": 1
+      // });
+      capturedPieceHistory.add(capturedPieceName);
+      saveFENAfterMove(targetPiece.abs());
+      playMusic("audio/piece_kill.mp3");
+      // Find the chess piece by name and update its count
+      List<String> words = capturedPieceName.split(' '); // Splitting by space
+      String pieceColor = words[0]; // "White"
+      String pieceName = words[1]; // "Pawn"
+      if (offline) {
+        for (var piece in ChessData.chessPieces) {
+          if (piece['name'] == pieceName && piece['color'] == pieceColor) {
+            piece['count'] = piece['count'] + 1;
+            if (pieceColor == "White") {
+              ChessData.blackTotalNumber =
+                  piece['num'] + ChessData.blackTotalNumber;
+            } else {
+              ChessData.whiteTotalNumber =
+                  piece['num'] + ChessData.whiteTotalNumber;
+            }
+            break;
+          }
+        }
+      }
+    } else {
+      capturedPieceHistory.add("");
+      playMusic("audio/piece_move.mp3");
+    }
     if (_canPromotePawn(_board, move)) {
       if (_pawnPromotion != null) {
         bool isWhitePiece =
             _board[move.currentPosition.row][move.currentPosition.col] > 0;
-        Future.delayed(const Duration(milliseconds: 100), () {
+        Future.delayed(const Duration(milliseconds: 300), () {
           _pawnPromotion!(isWhitePiece, move.targetPosition);
         });
       }
@@ -1053,6 +1129,7 @@ class ChessEngine {
   }
 
   ///This private method is used for Internal purpose.
+  ///This private method is used for Internal purpose.
   _initializeBoard() {
     if (chessConfig.fenString.isEmpty) {
       List<List<int>> chessBoard = [
@@ -1153,6 +1230,59 @@ class ChessEngine {
     } else {
       // Load FEN
       setFenString(chessConfig.fenString);
+    }
+  }
+
+  Future<void> playMusic(String musicPath) async {
+    // Use 'AssetSource' for playing from assets
+    AudioPlayer _audioPlayer = AudioPlayer();
+    await _audioPlayer.play(AssetSource(musicPath));
+  }
+
+  String getPieceName(int piece) {
+    switch (piece.abs()) {
+      case 100:
+        return piece > 0 ? "White Pawn" : "Black Pawn";
+      case 500:
+        return piece > 0 ? "White Rook" : "Black Rook";
+      case 320:
+        return piece > 0 ? "White Horse" : "Black Horse";
+      case 330:
+        return piece > 0 ? "White Bishop" : "Black Bishop";
+      case 900:
+        return piece > 0 ? "White Queen" : "Black Queen";
+      case 20000:
+        return piece > 0 ? "White King" : "Black King";
+      default:
+        return "Unknown piece";
+    }
+  }
+
+  // Simulate saving FEN and captured pieces after a move
+  void saveFENAfterMove(int? capturedPiece) {
+    String currentFEN = getFenString(true);
+    if (capturedPiece != null) {
+      capturedPieces.add(capturedPiece); // Add the captured piece to the list
+    }
+    fenHistoryWithCaptures.add({
+      'fen': currentFEN,
+      'capturedPieces':
+          List.from(capturedPieces) // Store captured pieces so far
+    });
+    print("Saved FEN: $currentFEN with captured pieces: $capturedPieces");
+  }
+
+  // Simulate restoring the game from a FEN string and captured pieces
+  void restoreFromFEN(int moveIndex) {
+    if (moveIndex >= 0 && moveIndex < fenHistoryWithCaptures.length) {
+      String selectedFEN = fenHistoryWithCaptures[moveIndex]['fen'];
+      List<int> capturedPiecesAtMove =
+          fenHistoryWithCaptures[moveIndex]['capturedPieces'];
+
+      // loadPositionFromFEN(selectedFEN);  // Restore board state from FEN
+      // restoreCapturedPieces(capturedPiecesAtMove);  // Restore captured pieces
+    } else {
+      print("Invalid move index");
     }
   }
 }
