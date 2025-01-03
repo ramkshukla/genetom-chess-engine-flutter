@@ -210,9 +210,12 @@ class ChessEngine {
       }
       validMove.shuffle();
       return MovesModel(
-          currentPosition: CellPosition(row: ele.row, col: ele.col),
-          targetPosition:
-              CellPosition(row: validMove[0].row, col: validMove[0].col));
+        currentPosition: CellPosition(row: ele.row, col: ele.col),
+        targetPosition: CellPosition(
+          row: validMove[0].row,
+          col: validMove[0].col,
+        ),
+      );
     }
     return null;
   }
@@ -597,6 +600,7 @@ class ChessEngine {
   void movePiece(MovesModel move, bool offline) {
     _updateHalfMoveClock(move);
     _updateFullMoveNumber(move);
+
     // Get the pieces on the board at the current and target positions
     int currentPiece =
         _board[move.currentPosition.row][move.currentPosition.col];

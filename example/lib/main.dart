@@ -37,7 +37,10 @@ class _ChessPageState extends State<ChessPage> {
   Color secondaryColor = const Color(0xfff5811d);
   Color bgColor = const Color(0xffF2F2F2);
   Color iconsTextColor = const Color(0xffFFFFFF);
+  bool inTargetPosition = false;
 
+  CellPosition? initialHighlightedPosition;
+  CellPosition? finalHighlightedPosition;
   List<CellPosition> validMoves = [];
   late bool isPlayerTurn;
   bool isPlayerWhite = true;
@@ -384,10 +387,13 @@ class _ChessPageState extends State<ChessPage> {
     Future.delayed(const Duration(milliseconds: 200), () async {
       isPlayerTurn = false;
       MovesModel? pos = await chessEngine.generateBestMove();
+
       if (pos == null) {
         return;
       }
       isPlayerTurn = true;
+      initialHighlightedPosition = pos.currentPosition;
+      finalHighlightedPosition = pos.targetPosition;
       chessEngine.movePiece(pos, false);
       resetMovesData();
       reloadBoard();
@@ -426,9 +432,7 @@ class _ChessPageState extends State<ChessPage> {
       body: Center(
         child: Column(
           children: [
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             SizedBox(
               height: dialogSize,
               width: dialogSize,
@@ -555,10 +559,17 @@ class _ChessPageState extends State<ChessPage> {
       if (checkIfThisBlockIsValidMove() &&
           currSelectedElementPosition != null) {
         MovesModel move = MovesModel(
-            targetPosition: CellPosition(row: row, col: col),
-            currentPosition: CellPosition(
-                row: currSelectedElementPosition!.row,
-                col: currSelectedElementPosition!.col));
+          targetPosition: CellPosition(row: row, col: col),
+          currentPosition: CellPosition(
+            row: currSelectedElementPosition!.row,
+            col: currSelectedElementPosition!.col,
+          ),
+        );
+        initialHighlightedPosition = CellPosition(
+          row: currSelectedElementPosition!.row,
+          col: currSelectedElementPosition!.col,
+        );
+        finalHighlightedPosition = CellPosition(row: row, col: col);
         chessEngine.movePiece(move, false);
         resetMovesData();
         reloadBoard();
@@ -595,8 +606,26 @@ class _ChessPageState extends State<ChessPage> {
         },
         child: Container(
           decoration: BoxDecoration(
-              borderRadius: borderRadius,
-              border: Border.all(color: Colors.green, width: 1)),
+            borderRadius: borderRadius,
+            border: Border.all(
+              color: (initialHighlightedPosition != null &&
+                          initialHighlightedPosition!.row == row &&
+                          initialHighlightedPosition!.col == col) ||
+                      (finalHighlightedPosition != null &&
+                          finalHighlightedPosition!.row == row &&
+                          finalHighlightedPosition!.col == col)
+                  ? Colors.yellow // Highlight border
+                  : Colors.green, // Default border
+              width: 2, // Adjust the width for better visibility
+            ),
+          ),
+          // decoration: BoxDecoration(
+          //   borderRadius: borderRadius,
+          //   border: Border.all(
+          //     color: Colors.green,
+          //     width: 1,
+          //   ),
+          // ),
           child: Container(
             decoration: BoxDecoration(
               color: color,
