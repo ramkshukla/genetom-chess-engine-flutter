@@ -87,6 +87,11 @@ class ChessData {
   static Map<String, int> blackKingPositions = {'row': 0, 'col': 4};
   static bool attackKing = false;
   static String? lastPieceMoveColor = "black";
+  static int unseenMsgCount = 0;
+  static bool chessOnline=false;
+  static List<MovesLogModel> onlineMoveLogs = [];
+  static int fiftyMoveCount =0;
+  static bool kingIsUnderCheck = false;
 }
 
 List<String> capturedPieceHistory = [];
