@@ -3,9 +3,10 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:genetom_chess_engine/genetom_chess_engine.dart';
+import 'package:genetom_chess_engine/src/chess_engine_core.dart';
+import 'package:genetom_chess_engine/src/valid_moves.dart';
 import 'package:genetom_chess_engine/src/chess_data.dart';
-import 'package:genetom_chess_engine/src/online_chess_data.dart';
+import 'package:online_chess_game/screen/onlineChessGame.dart';
 
 class ChessEngine {
   //Position tables
@@ -24,7 +25,7 @@ class ChessEngine {
   List<List<double>> _blackQueenTable = [];
   List<List<double>> _blackKingMidGameTable = [];
   List<List<double>> _blackKingEndgameTable = [];
-  bool _pieceCaptured = false;
+  bool _pieceCaptured=false;
   // Getter for pieceCaptured
   bool get pieceCaptured => _pieceCaptured;
 
@@ -32,8 +33,7 @@ class ChessEngine {
   set pieceCaptured(bool capturedPiece) {
     _pieceCaptured = capturedPiece;
   }
-
-  bool isWhite = false;
+  bool isWhite=false;
   List<List<int>> _board = [
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
@@ -51,6 +51,7 @@ class ChessEngine {
   Function(bool, CellPosition)? _pawnPromotion;
   late Function(GameOver) _gameOverCallback;
   final List<MovesLogModel> _moveLogs = [];
+
   // Method to capture a piece
   void capturePiece(String capturedPieceName) {
     capturedPieceHistory.add(capturedPieceName);
@@ -65,8 +66,8 @@ class ChessEngine {
 
   ChessEngine(ChessConfig config,
       {required Function(List<List<int>>) boardChangeCallback,
-      required Function(GameOver) gameOverCallback,
-      Function(bool, CellPosition)? pawnPromotion}) {
+        required Function(GameOver) gameOverCallback,
+        Function(bool, CellPosition)? pawnPromotion}) {
     chessConfig = config;
     boardViewIsWhite = chessConfig.isPlayerAWhite;
     _initializeBoard();
@@ -77,6 +78,7 @@ class ChessEngine {
     _pawnPromotion = pawnPromotion;
     _notifyBoardChangeCallback();
   }
+
 
   ///This Method will Initialize Difficult Mode.
   _initializeDifficultyMode() {
@@ -91,6 +93,7 @@ class ChessEngine {
     } else if (chessConfig.difficulty == Difficulty.asian) {
       _maxDepth = 6;
     }
+
   }
 
   ///This wi;; initialize the Position table.
@@ -204,18 +207,15 @@ class ChessEngine {
     allowedPeiceCoordinates.shuffle();
     for (var ele in allowedPeiceCoordinates) {
       List<CellPosition> validMove =
-          getValidMovesOfPeiceByPosition(_board, ele);
+      getValidMovesOfPeiceByPosition(_board, ele);
       if (validMove.isEmpty) {
         continue;
       }
       validMove.shuffle();
       return MovesModel(
-        currentPosition: CellPosition(row: ele.row, col: ele.col),
-        targetPosition: CellPosition(
-          row: validMove[0].row,
-          col: validMove[0].col,
-        ),
-      );
+          currentPosition: CellPosition(row: ele.row, col: ele.col),
+          targetPosition:
+          CellPosition(row: validMove[0].row, col: validMove[0].col));
     }
     return null;
   }
@@ -246,7 +246,7 @@ class ChessEngine {
         if (boardCopy[i][j] > emptyCellPower) {
           CellPosition currentPosition = CellPosition(row: i, col: j);
           List<CellPosition> possibleMove =
-              getValidMovesOfPeiceByPosition(boardCopy, currentPosition);
+          getValidMovesOfPeiceByPosition(boardCopy, currentPosition);
           for (CellPosition targetPosition in possibleMove) {
             movesList.add(MovesModel(
                 currentPosition: currentPosition,
@@ -266,7 +266,7 @@ class ChessEngine {
         if (boardCopy[i][j] < emptyCellPower) {
           CellPosition currentPosition = CellPosition(row: i, col: j);
           List<CellPosition> possibleMove =
-              getValidMovesOfPeiceByPosition(boardCopy, currentPosition);
+          getValidMovesOfPeiceByPosition(boardCopy, currentPosition);
           for (CellPosition targetPosition in possibleMove) {
             movesList.add(MovesModel(
                 currentPosition: currentPosition,
@@ -338,7 +338,7 @@ class ChessEngine {
         List<List<int>> boardCopy = ChessEngineHelpers.deepCopyBoard(currBoard);
         _movePieceForMinMax(boardCopy, possibleMove);
         double evaluation = _minimaxWithMoveAlphaBetaPruning(
-                boardCopy, depth - 1, alpha, beta, false)
+            boardCopy, depth - 1, alpha, beta, false)
             .score;
 
         //Undoing the changes
@@ -364,7 +364,7 @@ class ChessEngine {
         List<List<int>> boardCopy = ChessEngineHelpers.deepCopyBoard(currBoard);
         _movePieceForMinMax(boardCopy, possibleMove);
         double evaluation = _minimaxWithMoveAlphaBetaPruning(
-                boardCopy, depth - 1, alpha, beta, true)
+            boardCopy, depth - 1, alpha, beta, true)
             .score;
         //Undoing the changes
         MovesModel undoingMove = MovesModel(
@@ -551,7 +551,7 @@ class ChessEngine {
   void _movePieceForMinMax(List<List<int>> currBoard, MovesModel moves) {
     try {
       currBoard[moves.targetPosition.row][moves.targetPosition.col] =
-          currBoard[moves.currentPosition.row][moves.currentPosition.col];
+      currBoard[moves.currentPosition.row][moves.currentPosition.col];
       currBoard[moves.currentPosition.row][moves.currentPosition.col] =
           emptyCellPower;
     } catch (ex) {
@@ -578,7 +578,7 @@ class ChessEngine {
   ///This private method is used for Internal purpose.
   _updateHalfMoveClock(MovesModel move) {
     if ((_board[move.currentPosition.row][move.currentPosition.col].abs() ==
-            pawnPower) ||
+        pawnPower) ||
         (_board[move.currentPosition.row][move.currentPosition.col] > 0 &&
             _board[move.targetPosition.row][move.targetPosition.col] < 0) ||
         (_board[move.currentPosition.row][move.currentPosition.col] < 0 &&
@@ -597,35 +597,26 @@ class ChessEngine {
   }
 
   /// This method use to move a piece in a board.
-  void movePiece(MovesModel move, bool offline) {
+  void movePiece(MovesModel move,bool offline) {
     _updateHalfMoveClock(move);
     _updateFullMoveNumber(move);
-
     // Get the pieces on the board at the current and target positions
-    int currentPiece =
-        _board[move.currentPosition.row][move.currentPosition.col];
+    int currentPiece = _board[move.currentPosition.row][move.currentPosition.col];
     int targetPiece = _board[move.targetPosition.row][move.targetPosition.col];
-    // Check if there is an opponent's piece at the target position (capture occurs)
+// Check if there is an opponent's piece at the target position (capture occurs)
     ChessData.lastPieceMoveColor = currentPiece > 0 ? "white" : "black";
     (currentPiece == 20000 && currentPiece > 0)
-        ? ChessData.whiteKingPositions = {
-            'row': move.targetPosition.row,
-            'col': move.targetPosition.col
-          }
-        : ChessData.blackKingPositions = {
-            'row': move.targetPosition.row,
-            'col': move.targetPosition.col
-          };
+        ? ChessData.whiteKingPositions = {'row': move.targetPosition.row, 'col': move.targetPosition.col}
+        : ChessData.blackKingPositions = {'row': move.targetPosition.row, 'col': move.targetPosition.col};
 
     bool isCapture = targetPiece != emptyCellPower &&
         (targetPiece > 0 != currentPiece > 0); // Pieces are of opposite sides
-    OnlineChessData.caputuredPiece = "";
+    OnlineChessData.caputuredPiece="";
     if (isCapture) {
-      pieceCaptured = true;
-      print(
-          'Capture occurred: Piece captured at position (${move.targetPosition.row}, ${move.targetPosition.col})');
+      pieceCaptured=true;
+      print('Capture occurred: Piece captured at position (${move.targetPosition.row}, ${move.targetPosition.col})');
       String capturedPieceName = getPieceName(targetPiece);
-      OnlineChessData.caputuredPiece = capturedPieceName;
+      OnlineChessData.caputuredPiece=capturedPieceName;
       print("Captured Piece name ${capturedPieceName}");
       // chessPieces.add({
       // "name": "Bishop",
@@ -640,22 +631,22 @@ class ChessEngine {
       List<String> words = capturedPieceName.split(' '); // Splitting by space
       String pieceColor = words[0]; // "White"
       String pieceName = words[1]; // "Pawn"
-      if (offline) {
+      if(offline){
+        ChessData.fiftyMoveCount = 0;
         for (var piece in ChessData.chessPieces) {
-          if (piece['name'] == pieceName && piece['color'] == pieceColor) {
-            piece['count'] = piece['count'] + 1;
-            if (pieceColor == "White") {
-              ChessData.blackTotalNumber =
-                  piece['num'] + ChessData.blackTotalNumber;
-            } else {
-              ChessData.whiteTotalNumber =
-                  piece['num'] + ChessData.whiteTotalNumber;
+          if (piece['name'] == pieceName && piece['color']==pieceColor) {
+            piece['count'] = piece['count']+1;
+            if(pieceColor=="White"){
+              ChessData.blackTotalNumber=piece['num']+ChessData.blackTotalNumber;
+            }else{
+              ChessData.whiteTotalNumber=piece['num']+ChessData.whiteTotalNumber;
             }
             break;
           }
         }
       }
-    } else {
+
+    }else{
       capturedPieceHistory.add("");
       playMusic("audio/piece_move.mp3");
     }
@@ -663,26 +654,31 @@ class ChessEngine {
       if (_pawnPromotion != null) {
         bool isWhitePiece =
             _board[move.currentPosition.row][move.currentPosition.col] > 0;
-        Future.delayed(const Duration(milliseconds: 300), () {
-          _pawnPromotion!(isWhitePiece, move.targetPosition);
-        });
+        // Future.delayed(const Duration(milliseconds: 300), () {
+        //   _pawnPromotion!(isWhitePiece, move.targetPosition);
+        // });
       }
     }
 
     if (_board[move.currentPosition.row][move.currentPosition.col].abs() ==
-            kingPower &&
+        kingPower &&
         ((move.currentPosition.col - move.targetPosition.col).abs() == 2)) {
       // perfom castling
       _performCastling(_board, move);
     } else {
       _board[move.targetPosition.row][move.targetPosition.col] =
-          _board[move.currentPosition.row][move.currentPosition.col];
+      _board[move.currentPosition.row][move.currentPosition.col];
       _board[move.currentPosition.row][move.currentPosition.col] =
           emptyCellPower;
     }
     _moveLogs.add(MovesLogModel(
         move: move,
         piece: _board[move.targetPosition.row][move.targetPosition.col]));
+
+      ChessData.onlineMoveLogs.add(MovesLogModel(
+          move: move,
+          piece: _board[move.targetPosition.row][move.targetPosition.col]));
+
     GameOver? gameOverStatus = _checkIfGameOver(
         _board[move.targetPosition.row][move.targetPosition.col] > 0);
     if (gameOverStatus != null) {
@@ -694,20 +690,20 @@ class ChessEngine {
   ///This private method is used for Internal purpose.
   _performCastling(List<List<int>> currBoard, MovesModel move) {
     currBoard[move.targetPosition.row][move.targetPosition.col] =
-        currBoard[move.currentPosition.row][move.currentPosition.col];
+    currBoard[move.currentPosition.row][move.currentPosition.col];
     currBoard[move.currentPosition.row][move.currentPosition.col] =
         emptyCellPower;
 
     // Castling with Right side Rook
     if (move.targetPosition.col > move.currentPosition.col) {
       currBoard[move.currentPosition.row][move.currentPosition.col + 1] =
-          currBoard[move.currentPosition.row][7];
+      currBoard[move.currentPosition.row][7];
       currBoard[move.currentPosition.row][7] = emptyCellPower;
     }
     //Castling with left side rook
     else {
       currBoard[move.currentPosition.row][move.currentPosition.col - 1] =
-          currBoard[move.currentPosition.row][0];
+      currBoard[move.currentPosition.row][0];
       currBoard[move.currentPosition.row][0] = emptyCellPower;
     }
   }
@@ -715,7 +711,7 @@ class ChessEngine {
   ///This private method is used for Internal purpose.
   bool _canPromotePawn(List<List<int>> currBoard, MovesModel move) {
     if (currBoard[move.currentPosition.row][move.currentPosition.col] ==
-            pawnPower &&
+        pawnPower &&
         (move.targetPosition.row == 0 || move.targetPosition.row == 7)) {
       return true;
     }
@@ -833,7 +829,7 @@ class ChessEngine {
       }
 
       if ((_board[log.move.currentPosition.row][log.move.currentPosition.col] ==
-              topLeftRook) ||
+          topLeftRook) ||
           (_board[log.move.targetPosition.row][log.move.targetPosition.col] ==
               topLeftRook)) {
         if (chessConfig.isPlayerAWhite) {
@@ -843,7 +839,7 @@ class ChessEngine {
         }
       }
       if ((_board[log.move.currentPosition.row][log.move.currentPosition.col] ==
-              topRightRook) ||
+          topRightRook) ||
           (_board[log.move.targetPosition.row][log.move.targetPosition.col] ==
               topRightRook)) {
         if (chessConfig.isPlayerAWhite) {
@@ -853,7 +849,7 @@ class ChessEngine {
         }
       }
       if ((_board[log.move.currentPosition.row][log.move.currentPosition.col] ==
-              bottomLeftRook) ||
+          bottomLeftRook) ||
           (_board[log.move.targetPosition.row][log.move.targetPosition.col] ==
               bottomLeftRook)) {
         if (chessConfig.isPlayerAWhite) {
@@ -863,7 +859,7 @@ class ChessEngine {
         }
       }
       if ((_board[log.move.currentPosition.row][log.move.currentPosition.col] ==
-              bottomRightRook) ||
+          bottomRightRook) ||
           (_board[log.move.targetPosition.row][log.move.targetPosition.col] ==
               bottomRightRook)) {
         if (chessConfig.isPlayerAWhite) {
@@ -1237,12 +1233,13 @@ class ChessEngine {
     }
   }
 
+
+
   Future<void> playMusic(String musicPath) async {
     // Use 'AssetSource' for playing from assets
     AudioPlayer _audioPlayer = AudioPlayer();
     await _audioPlayer.play(AssetSource(musicPath));
   }
-
   String getPieceName(int piece) {
     switch (piece.abs()) {
       case 100:
@@ -1266,12 +1263,11 @@ class ChessEngine {
   void saveFENAfterMove(int? capturedPiece) {
     String currentFEN = getFenString(true);
     if (capturedPiece != null) {
-      capturedPieces.add(capturedPiece); // Add the captured piece to the list
+      capturedPieces.add(capturedPiece);  // Add the captured piece to the list
     }
     fenHistoryWithCaptures.add({
       'fen': currentFEN,
-      'capturedPieces':
-          List.from(capturedPieces) // Store captured pieces so far
+      'capturedPieces': List.from(capturedPieces)  // Store captured pieces so far
     });
     print("Saved FEN: $currentFEN with captured pieces: $capturedPieces");
   }
@@ -1280,8 +1276,7 @@ class ChessEngine {
   void restoreFromFEN(int moveIndex) {
     if (moveIndex >= 0 && moveIndex < fenHistoryWithCaptures.length) {
       String selectedFEN = fenHistoryWithCaptures[moveIndex]['fen'];
-      List<int> capturedPiecesAtMove =
-          fenHistoryWithCaptures[moveIndex]['capturedPieces'];
+      List<int> capturedPiecesAtMove = fenHistoryWithCaptures[moveIndex]['capturedPieces'];
 
       // loadPositionFromFEN(selectedFEN);  // Restore board state from FEN
       // restoreCapturedPieces(capturedPiecesAtMove);  // Restore captured pieces
@@ -1289,4 +1284,5 @@ class ChessEngine {
       print("Invalid move index");
     }
   }
+
 }
