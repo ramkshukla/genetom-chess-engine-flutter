@@ -584,6 +584,7 @@ class ValidMoves {
         ChessData.unvalidMoves.add(CellPosition(
             row: moves.targetPosition.row, col: moves.targetPosition.col));
       } else {
+        ChessData.unvalidMoves.clear();
         ChessData.invalidMove = false;
       }
       // Undoing the move
