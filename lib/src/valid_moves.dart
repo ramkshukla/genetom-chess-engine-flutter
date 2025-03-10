@@ -364,7 +364,7 @@ class ValidMoves {
       }
     }
     if(castlingPos.length!=0){
-      for(int i = 0;i<ChessData.unvalidMoves.length;i++){
+      for(int i = 0;i<ChessData.tempUnvalidMoves.length;i++){
         if((ChessData.unvalidMoves[i].row==7 && ChessData.unvalidMoves[i].col==5) || ChessData.kingIsUnderCheck){
           validMovesAfterCheckMateCheck.remove(CellPosition(row: 7, col: 6));
         }
@@ -582,6 +582,8 @@ class ValidMoves {
       if (res) {
         ChessData.invalidMove = true;
         ChessData.unvalidMoves.add(CellPosition(
+            row: moves.targetPosition.row, col: moves.targetPosition.col));
+         ChessData.tempUnvalidMoves.add(CellPosition(
             row: moves.targetPosition.row, col: moves.targetPosition.col));
       } else {
         ChessData.unvalidMoves.clear();
