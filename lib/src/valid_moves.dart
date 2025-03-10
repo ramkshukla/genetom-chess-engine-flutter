@@ -401,7 +401,7 @@ class ValidMoves {
       }
 
     }
-
+     ChessData.unvalidMoves.clear();
      ChessData.tempUnvalidMoves.clear();
     return validMovesAfterCheckMateCheck;
   }
