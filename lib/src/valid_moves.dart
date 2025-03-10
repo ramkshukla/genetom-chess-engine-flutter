@@ -102,7 +102,7 @@ class ValidMoves {
         validMovesAfterCheckMateCheck.add(validMovesList[inx]);
       }
     }
-    ChessData.unvalidMoves.clear();
+
     return validMovesAfterCheckMateCheck;
   }
 
@@ -174,7 +174,7 @@ class ValidMoves {
         validMovesAfterCheckMateCheck.add(validMovesList[inx]);
       }
     }
-    ChessData.unvalidMoves.clear();
+
     return validMovesAfterCheckMateCheck;
   }
 
@@ -263,7 +263,7 @@ class ValidMoves {
         validMovesAfterCheckMateCheck.add(validMovesList[inx]);
       }
     }
-    ChessData.unvalidMoves.clear();
+
     return validMovesAfterCheckMateCheck;
   }
 
@@ -387,7 +387,7 @@ class ValidMoves {
 
     }
 
-    ChessData.unvalidMoves.clear();
+    
     return validMovesAfterCheckMateCheck;
   }
 
@@ -560,7 +560,7 @@ class ValidMoves {
         validMovesAfterCheckMateCheck.add(filteredPawnMoves[inx]);
       }
     }
-    ChessData.unvalidMoves.clear();
+    
     return validMovesAfterCheckMateCheck;
   }
 
