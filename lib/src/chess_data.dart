@@ -76,6 +76,7 @@ class ChessData {
   static int whiteTotalNumber = 0;
   static int blackTotalNumber = 0;
   static List<CellPosition> unvalidMoves = [];
+  static List<CellPosition> tempUnvalidMoves = [];
   static List<int> rowCount = [8, 7, 6, 5, 4, 3, 2, 1];
   static List<int> rowCount1 = [1, 2, 3, 4, 5, 6, 7, 8];
   static List<String> colCount = ["A", "B", "C", "D", "E", "F", "G", "H"];
