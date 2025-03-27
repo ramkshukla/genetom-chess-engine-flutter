@@ -114,13 +114,20 @@ const List<List<double>> rookSquareTable = [
 
 ///Chess Config Model.
 class ChessConfig {
+  final int aiMoveDelayMs; // Visual delay before move
+  final int aiComputationDelayMs; // Artificial thinking delay
+  final int animationDurationMs;
   String fenString;
   Difficulty difficulty;
   bool isPlayerAWhite;
-  ChessConfig(
-      {required this.isPlayerAWhite,
-      this.fenString = '',
-      this.difficulty = Difficulty.easy});
+  ChessConfig({
+    required this.isPlayerAWhite,
+    this.fenString = '',
+    this.difficulty = Difficulty.easy,
+    this.aiMoveDelayMs = 100,
+    this.aiComputationDelayMs = 50,
+    this.animationDurationMs = 300,
+  });
 }
 
 ///This defines the posistion of a piece in a 2D array.
@@ -133,8 +140,9 @@ class CellPosition {
     if (identical(this, other)) return true;
     return other is CellPosition && other.row == row && other.col == col;
   }
-    @override
-    int get hashCode => row.hashCode ^ col.hashCode;
+
+  @override
+  int get hashCode => row.hashCode ^ col.hashCode;
 }
 
 ///This defines the moves.
