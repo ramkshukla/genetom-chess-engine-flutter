@@ -347,7 +347,7 @@ class ValidMoves {
     }
 
     List<CellPosition> castlingPos =
-        getValidCastlingPos(board, currPosition,boardViewIsWhite, movelogs);
+        getValidCastlingPos(board, currPosition, boardViewIsWhite, movelogs);
 
     validMovesList.addAll(castlingPos);
 
@@ -360,49 +360,65 @@ class ValidMoves {
 
       if (!checkMateCheckIfThisMovePerformed(board, move, boardViewIsWhite)) {
         validMovesAfterCheckMateCheck.add(validMovesList[inx]);
-
       }
     }
-    if(castlingPos.length!=0){
-      for(int i = 0;i<ChessData.tempUnvalidMoves.length;i++){
-        if((ChessData.tempUnvalidMoves[i].row==7 && ChessData.tempUnvalidMoves[i].col==5) || ChessData.kingIsUnderCheck || (ChessData.tempUnvalidMoves[i].row==7 && ChessData.tempUnvalidMoves[i].col==6)){
+    if (castlingPos.length != 0) {
+      for (int i = 0; i < ChessData.tempUnvalidMoves.length; i++) {
+        if ((ChessData.tempUnvalidMoves[i].row == 7 &&
+                ChessData.tempUnvalidMoves[i].col == 5) ||
+            ChessData.kingIsUnderCheck ||
+            (ChessData.tempUnvalidMoves[i].row == 7 &&
+                ChessData.tempUnvalidMoves[i].col == 6)) {
           validMovesAfterCheckMateCheck.remove(CellPosition(row: 7, col: 6));
-      
         }
-        if((ChessData.tempUnvalidMoves[i].row==7 && ChessData.tempUnvalidMoves[i].col==3) || ChessData.kingIsUnderCheck || (ChessData.tempUnvalidMoves[i].row==7 && ChessData.tempUnvalidMoves[i].col==2)){
+        if ((ChessData.tempUnvalidMoves[i].row == 7 &&
+                ChessData.tempUnvalidMoves[i].col == 3) ||
+            ChessData.kingIsUnderCheck ||
+            (ChessData.tempUnvalidMoves[i].row == 7 &&
+                ChessData.tempUnvalidMoves[i].col == 2)) {
           validMovesAfterCheckMateCheck.remove(CellPosition(row: 7, col: 2));
-        
         }
-      
-        if((ChessData.tempUnvalidMoves[i].row==7 && ChessData.tempUnvalidMoves[i].col==2) || ChessData.kingIsUnderCheck || (ChessData.tempUnvalidMoves[i].row==7 && ChessData.tempUnvalidMoves[i].col==1)){
+
+        if ((ChessData.tempUnvalidMoves[i].row == 7 &&
+                ChessData.tempUnvalidMoves[i].col == 2) ||
+            ChessData.kingIsUnderCheck ||
+            (ChessData.tempUnvalidMoves[i].row == 7 &&
+                ChessData.tempUnvalidMoves[i].col == 1)) {
           validMovesAfterCheckMateCheck.remove(CellPosition(row: 7, col: 1));
-         
         }
-        if((ChessData.tempUnvalidMoves[i].row==7 && ChessData.tempUnvalidMoves[i].col==4) || ChessData.kingIsUnderCheck || (ChessData.tempUnvalidMoves[i].row==7 && ChessData.tempUnvalidMoves[i].col==4)){
+        if ((ChessData.tempUnvalidMoves[i].row == 7 &&
+                ChessData.tempUnvalidMoves[i].col == 4) ||
+            ChessData.kingIsUnderCheck ||
+            (ChessData.tempUnvalidMoves[i].row == 7 &&
+                ChessData.tempUnvalidMoves[i].col == 5)) {
           validMovesAfterCheckMateCheck.remove(CellPosition(row: 7, col: 5));
-        
         }
-        if((ChessData.tempUnvalidMoves[i].row==0 && ChessData.tempUnvalidMoves[i].col==5) || ChessData.kingIsUnderCheck){
+        if ((ChessData.tempUnvalidMoves[i].row == 0 &&
+                ChessData.tempUnvalidMoves[i].col == 5) ||
+            ChessData.kingIsUnderCheck) {
           validMovesAfterCheckMateCheck.remove(CellPosition(row: 0, col: 6));
-        
         }
-          if((ChessData.tempUnvalidMoves[i].row==0 && ChessData.tempUnvalidMoves[i].col==3) || ChessData.kingIsUnderCheck || (ChessData.tempUnvalidMoves[i].row==0 && ChessData.tempUnvalidMoves[i].col==2)){
+        if ((ChessData.tempUnvalidMoves[i].row == 0 &&
+                ChessData.tempUnvalidMoves[i].col == 3) ||
+            ChessData.kingIsUnderCheck ||
+            (ChessData.tempUnvalidMoves[i].row == 0 &&
+                ChessData.tempUnvalidMoves[i].col == 2)) {
           validMovesAfterCheckMateCheck.remove(CellPosition(row: 0, col: 2));
-      
         }
-         if((ChessData.tempUnvalidMoves[i].row==0 && ChessData.tempUnvalidMoves[i].col==6) || ChessData.kingIsUnderCheck){
+        if ((ChessData.tempUnvalidMoves[i].row == 0 &&
+                ChessData.tempUnvalidMoves[i].col == 6) ||
+            ChessData.kingIsUnderCheck) {
           validMovesAfterCheckMateCheck.remove(CellPosition(row: 0, col: 6));
-        
         }
-        if((ChessData.tempUnvalidMoves[i].row==0 && ChessData.tempUnvalidMoves[i].col==3) || ChessData.kingIsUnderCheck){
+        if ((ChessData.tempUnvalidMoves[i].row == 0 &&
+                ChessData.tempUnvalidMoves[i].col == 3) ||
+            ChessData.kingIsUnderCheck) {
           validMovesAfterCheckMateCheck.remove(CellPosition(row: 0, col: 2));
-        
         }
       }
-
     }
-     ChessData.unvalidMoves.clear();
-     ChessData.tempUnvalidMoves.clear();
+    ChessData.tempUnvalidMoves.clear();
+    ChessData.unvalidMoves.clear();
     return validMovesAfterCheckMateCheck;
   }
 
@@ -423,13 +439,13 @@ class ValidMoves {
       firstRookPos = CellPosition(row: 7, col: 0);
       secondRookPos = CellPosition(row: 7, col: 7);
     } else {
-       if(ChessData.chessOnline){
-         firstRookPos = CellPosition(row: 7, col: 0);
-         secondRookPos = CellPosition(row: 7, col: 7);
-       }else{
-         firstRookPos = CellPosition(row: 0, col: 0);
-         secondRookPos = CellPosition(row: 0, col: 7);
-       }
+      if (ChessData.chessOnline) {
+        firstRookPos = CellPosition(row: 7, col: 0);
+        secondRookPos = CellPosition(row: 7, col: 7);
+      } else {
+        firstRookPos = CellPosition(row: 0, col: 0);
+        secondRookPos = CellPosition(row: 0, col: 7);
+      }
     }
     if (currBoard[firstRookPos.row][firstRookPos.col] != currRookPower) {
       // First Rook moved
@@ -575,7 +591,7 @@ class ValidMoves {
         validMovesAfterCheckMateCheck.add(filteredPawnMoves[inx]);
       }
     }
-    
+
     return validMovesAfterCheckMateCheck;
   }
 
@@ -598,7 +614,7 @@ class ValidMoves {
         ChessData.invalidMove = true;
         ChessData.unvalidMoves.add(CellPosition(
             row: moves.targetPosition.row, col: moves.targetPosition.col));
-         ChessData.tempUnvalidMoves.add(CellPosition(
+        ChessData.tempUnvalidMoves.add(CellPosition(
             row: moves.targetPosition.row, col: moves.targetPosition.col));
       } else {
         ChessData.unvalidMoves.clear();
