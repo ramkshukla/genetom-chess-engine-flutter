@@ -7,7 +7,6 @@ import 'package:genetom_chess_engine/src/chess_engine_core.dart';
 import 'package:genetom_chess_engine/src/online_chess_data.dart';
 import 'package:genetom_chess_engine/src/valid_moves.dart';
 import 'package:genetom_chess_engine/src/chess_data.dart';
-import 'package:online_chess_game/screen/onlineChessGame.dart';
 
 class ChessEngine {
   //Position tables
