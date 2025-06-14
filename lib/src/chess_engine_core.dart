@@ -133,8 +133,9 @@ class CellPosition {
     if (identical(this, other)) return true;
     return other is CellPosition && other.row == row && other.col == col;
   }
-    @override
-    int get hashCode => row.hashCode ^ col.hashCode;
+
+  @override
+  int get hashCode => row.hashCode ^ col.hashCode;
 }
 
 ///This defines the moves.
