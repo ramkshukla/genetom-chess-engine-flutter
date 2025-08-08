@@ -440,8 +440,14 @@ class ValidMoves {
       secondRookPos = CellPosition(row: 7, col: 7);
     } else {
       if (ChessData.chessOnline) {
-        firstRookPos = CellPosition(row: 7, col: 0);
-        secondRookPos = CellPosition(row: 7, col: 7);
+        if(ChessData.computerJoined){
+          firstRookPos = CellPosition(row: 0, col: 0);
+          secondRookPos = CellPosition(row: 0, col: 7);
+        }else{
+          firstRookPos = CellPosition(row: 7, col: 0);
+          secondRookPos = CellPosition(row: 7, col: 7);
+        }
+
       } else {
         firstRookPos = CellPosition(row: 0, col: 0);
         secondRookPos = CellPosition(row: 0, col: 7);
